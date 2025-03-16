@@ -1,10 +1,13 @@
 import pandas as pd
+from pathlib import Path
 
 DATA_URL = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
-DATA_PATH = "lab2/data/titanic.csv"
+DATA_PATH = "./data/titanic.csv"
+
+file_path = Path(DATA_PATH)
+file_path.parent.mkdir(parents=True, exist_ok=True)
 
 def download_data():
-    """Скачивает данные Titanic и сохраняет их в CSV-файл."""
     try:
         df = pd.read_csv(DATA_URL)
         df.to_csv(DATA_PATH, index=False)

@@ -2,9 +2,9 @@ import pandas as pd
 import pickle
 from sklearn.metrics import accuracy_score
 
-TEST_PATH = "lab2/data/test.csv"
-MODEL_PATH = "lab2/model/titanic_model.pkl"
-Y_TEST_PATH = "lab2/data/y_test.csv"
+TEST_PATH = "./data/test.csv"
+MODEL_PATH = "./model/titanic_model.pkl"
+Y_TEST_PATH = "./data/y_test.csv"
 
 def evaluate_model():
     try:
