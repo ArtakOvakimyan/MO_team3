@@ -2,6 +2,12 @@ pipeline {
     agent any
 
     stages {
+        stage('Setting the variables values') {
+            steps {
+                sh '#!/bin/bash'
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/ArtakOvakimyan/MO_team3', branch: 'main'
