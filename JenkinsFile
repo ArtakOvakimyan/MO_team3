@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Get Data') {
             steps {
-                sh ''''#!/bin/bash
+                sh '''#!/bin/bash
                 source lab2_env/bin/activate && python lab2/get_data.py
                 '''
             }
