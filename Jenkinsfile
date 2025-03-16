@@ -7,7 +7,7 @@ pipeline {
                 git url: 'https://github.com/ArtakOvakimyan/MO_team3', branch: 'main'
             }
         }
-        stage('Setup Environment') {
+        stage('Setup Virtual Environment') {
             steps {
                 sh '''#!/bin/bash
                 python3 -m venv lab2_env
