@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/ArtakOvakimyan/MO_team3', branch: 'main'
+            }
+        }
+        stage('Setup Environment') {
+            steps {
+                sh 'python3 -m venv lab2_env'
+                sh 'source lab2_env/bin/activate'
+                sh 'pip install -r requirements.txt'
+            }
+        }
+        stage('Get Data') {
+            steps {
+                sh 'source lab2_env/bin/activate && python lab2/get_data.py'
+            }
+        }
+        stage('Preprocess Data') {
+            steps {
+                sh 'source lab2_env/bin/activate && python lab2/preprocess_data.py'
+            }
+        }
+        stage('Train Model') {
+            steps {
+                sh 'source lab2_env/bin/activate && python lab2/train_model.py'
+            }
+        }
+        stage('Evaluate Model') {
+            steps {
+                sh 'source lab2_env/bin/activate && python lab2/evaluate_model.py'
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline finished'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
+}
