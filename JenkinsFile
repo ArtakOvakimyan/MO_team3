@@ -2,12 +2,6 @@ pipeline {
     agent any
 
     stages {
-        stage('Setting the variables values') {
-            steps {
-                sh '#!/bin/bash'
-            }
-        }
-
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/ArtakOvakimyan/MO_team3', branch: 'main'
@@ -15,6 +9,7 @@ pipeline {
         }
         stage('Setup Environment') {
             steps {
+                sh '#!/bin/bash'
                 sh 'python3 -m venv lab2_env'
                 sh 'source lab2_env/bin/activate'
                 sh 'pip install -r requirements.txt'
@@ -22,21 +17,25 @@ pipeline {
         }
         stage('Get Data') {
             steps {
+                sh '#!/bin/bash'
                 sh 'source lab2_env/bin/activate && python lab2/get_data.py'
             }
         }
         stage('Preprocess Data') {
             steps {
+                sh '#!/bin/bash'
                 sh 'source lab2_env/bin/activate && python lab2/preprocess_data.py'
             }
         }
         stage('Train Model') {
             steps {
+                sh '#!/bin/bash'
                 sh 'source lab2_env/bin/activate && python lab2/train_model.py'
             }
         }
         stage('Evaluate Model') {
             steps {
+                sh '#!/bin/bash'
                 sh 'source lab2_env/bin/activate && python lab2/evaluate_model.py'
             }
         }
