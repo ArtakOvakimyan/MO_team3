@@ -1,7 +1,10 @@
-version: '3.8'
 services:
   app:
     build: .
     ports:
       - "8501:8501"
-    restart: unless-stopped
+    volumes:
+      - ./app:/app  # Для разработки с hot-reload
+    environment:
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0

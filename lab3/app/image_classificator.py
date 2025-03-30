@@ -1,49 +1,57 @@
-import io
 import streamlit as st
 from PIL import Image
 import numpy as np
-from tensorflow.keras.applications import EfficientNetB0
-from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.efficientnet import preprocess_input, decode_predictions
+import tensorflow as tf
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 
-
-@st.cache(allow_output_mutation=True)
+# Загружаем модель (кешируем)
+@st.cache_resource
 def load_model():
-    return EfficientNetB0(weights='imagenet')
+    return MobileNetV2(weights='imagenet')
 
+# Словарь с переводом популярных классов
+CLASS_TRANSLATION = {
+    "dog": "собака",
+    "cat": "кошка",
+    "car": "автомобиль",
+    "bird": "птица",
+    "apple": "яблоко",
+    # Добавьте другие нужные переводы
+}
 
 def preprocess_image(img):
+    # Конвертируем RGBA в RGB при необходимости
+    if img.mode == 'RGBA':
+        img = img.convert('RGB')
     img = img.resize((224, 224))
-    x = image.img_to_array(img)
+    x = np.array(img)
     x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-    return x
-
+    return preprocess_input(x)
 
 def load_image():
-    uploaded_file = st.file_uploader(label='Выберите изображение для распознавания')
-    if uploaded_file is not None:
-        image_data = uploaded_file.getvalue()
-        st.image(image_data)
-        return Image.open(io.BytesIO(image_data))
-    else:
-        return None
+    uploaded_file = st.file_uploader("📤 Загрузите изображение", type=['jpg', 'jpeg', 'png'])
+    if uploaded_file:
+        img = Image.open(uploaded_file)
+        st.image(img, caption="Ваше изображение", use_column_width=True)
+        return img
+    return None
 
+def display_predictions(preds, top=3):
+    st.write("🔍 **Результаты распознавания:**")
+    top_indices = preds[0].argsort()[-top:][::-1]
+    for i, idx in enumerate(top_indices):
+        st.success(f"{i+1}. Class {idx} (probability: {preds[0][idx]*100:.1f}%)")
 
-def print_predictions(preds):
-    classes = decode_predictions(preds, top=3)[0]
-    for cl in classes:
-        st.write(cl[1], cl[2])
-
-
+# --- Основной интерфейс ---
 model = load_model()
+st.title("🖼️ Классификатор изображений")
 
-
-st.title('Новая улучшенная классификации изображений в облаке Streamlit')
 img = load_image()
-result = st.button('Распознать изображение')
-if result:
-    x = preprocess_image(img)
-    preds = model.predict(x)
-    st.write('**Результаты распознавания:**')
-    print_predictions(preds)
+if img and st.button("🔎 Распознать"):
+    with st.spinner("Анализируем изображение..."):
+        try:
+            x = preprocess_image(img)
+            preds = model.predict(x)
+            display_predictions(preds)
+        except Exception as e:
+            st.error(f"Ошибка: {str(e)}")
