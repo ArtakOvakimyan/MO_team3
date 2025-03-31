@@ -2,25 +2,23 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input, decode_predictions
+import requests
+import json
 
-# Загружаем модель (кешируем)
 @st.cache_resource
 def load_model():
     return MobileNetV2(weights='imagenet')
 
-# Словарь с переводом популярных классов
-CLASS_TRANSLATION = {
-    "dog": "собака",
-    "cat": "кошка",
-    "car": "автомобиль",
-    "bird": "птица",
-    "apple": "яблоко",
-    # Добавьте другие нужные переводы
-}
+
+@st.cache_data
+def load_imagenet_labels():
+    url = "https://storage.googleapis.com/download.tensorflow.org/data/imagenet_class_index.json"
+    response = requests.get(url)
+    class_data = response.json()
+    return {int(idx): (class_id, name) for idx, (class_id, name) in class_data.items()}
 
 def preprocess_image(img):
-    # Конвертируем RGBA в RGB при необходимости
     if img.mode == 'RGBA':
         img = img.convert('RGB')
     img = img.resize((224, 224))
@@ -37,13 +35,15 @@ def load_image():
     return None
 
 def display_predictions(preds, top=3):
+    decoded_preds = decode_predictions(preds, top=top)[0]
+    
     st.write("🔍 **Результаты распознавания:**")
-    top_indices = preds[0].argsort()[-top:][::-1]
-    for i, idx in enumerate(top_indices):
-        st.success(f"{i+1}. Class {idx} (probability: {preds[0][idx]*100:.1f}%)")
+    for i, (class_id, class_name_en, prob) in enumerate(decoded_preds):
+        st.success(f"{i+1}. {class_name_en} (точность: {prob*100:.1f}%)")
 
 # --- Основной интерфейс ---
 model = load_model()
+imagenet_labels = load_imagenet_labels()
 st.title("🖼️ Классификатор изображений")
 
 img = load_image()
