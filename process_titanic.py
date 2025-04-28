@@ -4,12 +4,8 @@ import sys
 import os
 
 def select_columns(input_path, output_path):
-    """
-    Выбирает колонки 'Pclass', 'Sex', 'Age' из CSV файла.
-    """
     try:
         df = pd.read_csv(input_path)
-        # Проверяем наличие необходимых колонок
         required_cols = ['Pclass', 'Sex', 'Age']
         if not all(col in df.columns for col in required_cols):
             missing = [col for col in required_cols if col not in df.columns]
@@ -27,9 +23,6 @@ def select_columns(input_path, output_path):
         sys.exit(1)
 
 def fill_age(input_path, output_path):
-    """
-    Заполняет пропущенные значения в колонке 'Age' средним значением.
-    """
     try:
         df = pd.read_csv(input_path)
         if 'Age' not in df.columns:
@@ -53,20 +46,16 @@ def fill_age(input_path, output_path):
         sys.exit(1)
 
 def one_hot_sex(input_path, output_path):
-    """
-    Применяет one-hot encoding к колонке 'Sex'.
-    """
     try:
         df = pd.read_csv(input_path)
         if 'Sex' not in df.columns:
             print(f"Ошибка: Колонка 'Sex' отсутствует в файле {input_path}", file=sys.stderr)
             sys.exit(1)
 
-        # Проверяем, не было ли уже применено one-hot encoding
         if 'Sex_male' in df.columns or 'Sex_female' in df.columns:
              print("Похоже, one-hot encoding для 'Sex' уже применен. Пропуск шага.")
         else:
-            df = pd.get_dummies(df, columns=['Sex'], prefix='Sex', drop_first=False) # drop_first=False чтобы были обе колонки
+            df = pd.get_dummies(df, columns=['Sex'], prefix='Sex', drop_first=False)
             print("Применен one-hot encoding для колонки 'Sex'.")
 
         df.to_csv(output_path, index=False)
@@ -89,7 +78,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # Убедимся, что директория для выходного файла существует
     output_dir = os.path.dirname(args.output)
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -99,4 +87,4 @@ if __name__ == "__main__":
     elif args.task == 'fill_age':
         fill_age(args.input, args.output)
     elif args.task == 'one_hot_sex':
-        one_hot_sex(args.input, args.output) 
+        one_hot_sex(args.input, args.output)
