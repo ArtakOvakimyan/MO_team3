@@ -1,0 +1,37 @@
+stages:
+  - setup
+  - test
+  - docker
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+setup:
+  stage: setup
+  image: python:3.13
+  variables:
+    DVC_CONFIG: .dvc/config
+    DVC_LOCAL_CONFIG: .dvc/config.local
+    DRIVE_CREDENTIALS: drive-credentials
+  script:
+    - pip install -r requirements.txt
+    - echo "$DRIVE_CREDENTIALS" > $DVC_LOCAL_CONFIG
+    - dvc pull
+  artifacts:
+    paths:
+      - data/
+
+test:
+  stage: test
+  image: python:3.13
+  script:
+    - pip install -r requirements.txt
+    - pytest src/tests
+
+docker-build:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker build -t toxicity-api:latest .
