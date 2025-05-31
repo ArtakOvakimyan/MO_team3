@@ -1,0 +1,5 @@
+outs:
+- md5: 5fb02d7674194a5f7c294d040f9aa989
+  size: 490
+  hash: md5
+  path: test_set.json
