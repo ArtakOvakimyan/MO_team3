@@ -1,0 +1,5 @@
+[core]
+    remote = dvc
+['remote "dvc"']
+    url = s3://dvccccccccc/dvc
+    endpointurl = https://storage.yandexcloud.net
